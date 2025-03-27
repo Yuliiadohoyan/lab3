@@ -4,7 +4,7 @@ import streamlit as st
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-def clean_html_tags(df):
+def clean_html_tags(df): # додаткове завдання
     for column in df.columns:
         df[column] = df[column].astype(str).str.replace(r'<.*?>', '', regex=True)
     return df
@@ -110,10 +110,20 @@ with tab2:
 
 with tab3:
     st.write(f"Теплова карта {indicator}")
-    pivot_table = filtered_data.pivot(index="Year", columns="Week", values=indicator)
+    pivot_table = filtered_data.pivot(index="Year", columns="Week", values=indicator, annot = True)
     fig, ax = plt.subplots(figsize=(10, 6))
     sns.heatmap(pivot_table, cmap="YlGnBu", linewidths=0.5, ax=ax)
-    ax.set_title(f"Теплова карта {indicator} для області {selected_province}")
     st.pyplot(fig)
+
+    st.write(f"Порівняння {indicator} для {selected_province}")
+    comparison = df.groupby('province_id')[indicator].mean().sort_values()
+    fig2, ax2 = plt.subplots(figsize=(12, 6))
+    comparison.plot(kind='bar', ax=ax2)
+    ax2.set_title(f'Порівняння середніх значень {indicator} по областях')
+    ax2.set_xlabel('Код області')
+    ax2.set_ylabel(f'Середнє значення {indicator}')
+    st.pyplot(fig2)
+
+
 
 
